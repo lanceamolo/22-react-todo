@@ -25,7 +25,10 @@ export default (state = initialState, action) => {
     case ADD_TODO:
       return {
         ...state,
-        todos: [...state.todos, { id: generateId(), input: action.payload }],
+        todos: [
+          ...state.todos,
+          { id: generateId(), input: action.payload, complete: false },
+        ],
       }
     case DELETE_TODO:
       return {
@@ -33,7 +36,15 @@ export default (state = initialState, action) => {
         todos: state.todos.filter((todo) => todo.id !== action.payload),
       }
     case COMPLETE_TODO:
-      return { ...state, todos: [...state.todos, action.payload] }
+      return {
+        ...state,
+        todos: state.todos.map((todo) => {
+          if (todo.id === action.payload) {
+            todo.complete = !todo.complete
+          }
+          return todo
+        }),
+      }
     default:
       return state
   }
@@ -55,9 +66,19 @@ function deleteListItem(id) {
 }
 
 function completeListItem(id) {
-  return {
-    type: COMPLETE_TODO,
-    payload: id,
+  let complete = ADD_TODO.complete
+  if (complete === false) {
+    return {
+      complete: true,
+      type: COMPLETE_TODO,
+      payload: id,
+    }
+  } else {
+    return {
+      complete: false,
+      type: COMPLETE_TODO,
+      payload: id,
+    }
   }
 }
 
